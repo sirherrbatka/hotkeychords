@@ -47,7 +47,7 @@ class InputGroup():
             return
         elapsed_time = 0.0
         start_time = time.clock_gettime(time.CLOCK_REALTIME)
-        while elapsed_time < DWELL_TIME:
+        while elapsed_time + 0.01 < DWELL_TIME:
             with CONDITION:
                 activated = CONDITION.wait(DWELL_TIME-elapsed_time)
             elapsed_time = time.clock_gettime(time.CLOCK_REALTIME)-start_time
@@ -62,7 +62,7 @@ class InputGroup():
             else:
                 if self.action != None:
                     self.action()
-                    return
+                return
 
 MAIN_GROUP=InputGroup(COMBINATIONS, 0)
 

@@ -1,7 +1,7 @@
 import pynput,time,threading
 from chords import COMBINATIONS
 
-DWELL_TIME = 0.5
+DWELL_TIME = 0.7
 CURRENT = set()
 CONDITION = threading.Condition()
 
@@ -14,13 +14,7 @@ def on_press(key):
         CONDITION.notifyAll()
 
 def on_release(key):
-    try:
-        if type(key) is pynput.keyboard.KeyCode:
-            CURRENT.remove(key.char)
-        else:
-            CURRENT.remove(key)
-    except KeyError:
-        pass
+    CURRENT.clear()
 
 listener = pynput.keyboard.Listener(on_press=on_press, on_release=on_release)
 listener.start()
@@ -47,20 +41,21 @@ class InputGroup():
             return
         elapsed_time = 0.0
         start_time = time.clock_gettime(time.CLOCK_REALTIME)
+        hit_anything = False
         while elapsed_time + 0.01 < DWELL_TIME:
             with CONDITION:
                 activated = CONDITION.wait(DWELL_TIME-elapsed_time)
             elapsed_time = time.clock_gettime(time.CLOCK_REALTIME)-start_time
             if activated:
+                hit_anything = True
                 try:
                     key = tuple(sorted(hash(o) for o in CURRENT))
                     operation = self.nexts[key]
-                    operation.launch()
-                    return
+                    return operation.launch()
                 except KeyError:
                     pass
             else:
-                if self.action != None:
+                if self.action != None and not hit_anything:
                     self.action()
                 return
 

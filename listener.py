@@ -1,7 +1,7 @@
 import pynput,time,threading
 from chords import COMBINATIONS
 
-DWELL_TIME = 1.0
+DWELL_TIME = 0.5
 CURRENT = set()
 CONDITION = threading.Condition()
 
@@ -40,37 +40,38 @@ class InputGroup():
         self.nexts = {}
         for combo,chords in next_chords.items():
             self.nexts[combo] = InputGroup(chords, index+1)
+
     def launch(self):
         if len(self.nexts) == 0 and self.action != None:
             self.action()
             return
         elapsed_time = 0.0
         start_time = time.clock_gettime(time.CLOCK_REALTIME)
-        with CONDITION:
-            while elapsed_time < DWELL_TIME:
+        while elapsed_time < DWELL_TIME:
+            with CONDITION:
                 activated = CONDITION.wait(DWELL_TIME-elapsed_time)
-                elapsed_time = time.clock_gettime(time.CLOCK_REALTIME)-start_time
-                if activated:
-                    try:
-                        key = tuple(sorted(hash(o) for o in CURRENT))
-                        operation = self.nexts[key]
-                        operation.launch()
-                        return
-                    except KeyError:
-                        pass
-                else:
-                    if self.action != None:
-                        self.action()
-                        return
+            elapsed_time = time.clock_gettime(time.CLOCK_REALTIME)-start_time
+            if activated:
+                try:
+                    key = tuple(sorted(hash(o) for o in CURRENT))
+                    operation = self.nexts[key]
+                    operation.launch()
+                    return
+                except KeyError:
+                    pass
+            else:
+                if self.action != None:
+                    self.action()
+                    return
 
 MAIN_GROUP=InputGroup(COMBINATIONS, 0)
 
-with CONDITION:
-    while True:
-        if len(CURRENT) == 0:
+while True:
+    if len(CURRENT) == 0:
+        with CONDITION:
             CONDITION.wait()
-        else:
-            try:
-                MAIN_GROUP.launch()
-            except KeyError:
-                time.sleep(0.2)
+    else:
+        try:
+            MAIN_GROUP.launch()
+        except KeyError:
+            time.sleep(0.2)

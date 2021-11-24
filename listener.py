@@ -1,7 +1,7 @@
 import pynput,time,threading
 from chords import COMBINATIONS
 
-DWELL_TIME = 0.7
+DWELL_TIME = 0.8
 CURRENT = set()
 CONDITION = threading.Condition()
 

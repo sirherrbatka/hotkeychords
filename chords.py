@@ -33,16 +33,18 @@ def yakuake():
     keyboard.release(Key.f12)
 
 COMBINATIONS = [
+    (combination([Key.cmd, Key.scroll_lock],[Key.cmd, Key.f6]), open_app("kronometer")),
     (combination([Key.cmd, Key.f6]), open_app("dolphin")),
-    (combination([Key.cmd, Key.f11]), open_app("marble")),
-    (combination([Key.cmd, Key.f11], [Key.cmd, Key.f11]), open_and_switch_desktop("firefox google.pl/maps/preview", 1)),
+    (combination([Key.cmd, Key.f11],[Key.cmd, Key.f11]), open_app("marble")),
+    (combination([Key.cmd, Key.f11]), open_app("krunner")),
     (combination([Key.cmd, Key.f12]), open_app("konsole --workdir /home/shka/ -e ipython")),
     (combination([Key.cmd, Key.f12], [Key.cmd, Key.f12]), open_app("konsole --workdir /home/shka/ -e rlwrap sbcl --noinform --userinit /home/shka/.shclrc")),
-    (combination([Key.cmd, Key.scroll_lock]), yakuake),
-    (combination([Key.cmd, Key.scroll_lock], [Key.scroll_lock, Key.cmd]), open_app("konsole --workdir=/home/shka/")),
+    (combination([Key.cmd, Key.scroll_lock]), open_app("konsole --workdir=/home/shka/")),
+    (combination([Key.cmd, Key.scroll_lock], [Key.scroll_lock, Key.cmd]), open_app("yakuake")),
     (combination([Key.cmd, Key.scroll_lock], [Key.cmd, Key.f7]), open_app("konsole --workdir=/home/shka/Repozytoria/")),
     (combination([Key.cmd, Key.scroll_lock], [Key.cmd, Key.f7], [Key.cmd, Key.f7]), open_app("konsole --workdir=/home/shka/quicklisp/local-projects/")),
     (combination([Key.cmd, Key.scroll_lock], [Key.cmd, Key.f10]), open_app("konsole --workdir=/home/shka/Pobrane/")),
+    (combination([Key.cmd, Key.f11], [Key.cmd, Key.f7]), open_and_switch_desktop("firefox google.pl/maps/preview", 1)),
     (combination([Key.cmd, Key.f7]), open_and_switch_desktop("firefox --new-tab --url about:newtab", 1)),
     (combination([Key.cmd, Key.f7], [Key.cmd, Key.f2]), open_and_switch_desktop("firefox youtube.com", 1)),
     (combination([Key.cmd, Key.f7], [Key.cmd, Key.f3]), open_and_switch_desktop("firefox old.reddit.com/", 1)),

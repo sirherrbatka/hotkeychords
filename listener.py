@@ -1,7 +1,7 @@
 import pynput,time,threading
 from chords import COMBINATIONS
 
-DWELL_TIME = 0.8
+DWELL_TIME = 0.6
 CURRENT = set()
 CONDITION = threading.Condition()
 
@@ -11,7 +11,7 @@ def on_press(key):
     else:
         CURRENT.add(key)
     with CONDITION:
-        CONDITION.notifyAll()
+        CONDITION.notify_all()
 
 def on_release(key):
     CURRENT.clear()

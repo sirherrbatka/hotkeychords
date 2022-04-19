@@ -1,20 +1,38 @@
 import pynput,time,threading
+from enum import IntEnum
 from chords import COMBINATIONS
 
 DWELL_TIME = 0.6
-CURRENT = set()
+CURRENT = dict()
 CONDITION = threading.Condition()
 
-def on_press(key):
+def key_number(key):
     if type(key) is pynput.keyboard.KeyCode:
-        CURRENT.add(key.char)
+        return hash(key.char)
     else:
-        CURRENT.add(key)
+        return hash(key.value)
+
+def add_key(key):
+    n = key_number(key)
+    CURRENT.setdefault(n, 0)
+    CURRENT[n]+=1
+
+def on_press(key):
+    add_key(key)
     with CONDITION:
         CONDITION.notify_all()
 
 def on_release(key):
-    CURRENT.clear()
+    n = key_number(key)
+    if n in CURRENT:
+        v = CURRENT[n]-1
+        if v <= 0:
+            del CURRENT[n]
+        else:
+            CURRENT[n] = v
+
+def key_tuple(keys):
+    return tuple(sorted(key_number(key) for key in keys))
 
 listener = pynput.keyboard.Listener(on_press=on_press, on_release=on_release)
 listener.start()
@@ -26,9 +44,10 @@ class InputGroup():
         for chord in chords:
             chord_length = len(chord[0])
             if index < chord_length:
-                n = next_chords.get(chord[0][index], [])
+                keys = key_tuple(chord[0][index])
+                n = next_chords.get(keys, [])
                 n.append(chord)
-                next_chords[chord[0][index]] = n
+                next_chords[keys] = n
             else:
                 self.action = chord[1]
         self.nexts = {}
@@ -49,7 +68,7 @@ class InputGroup():
             if activated:
                 hit_anything = True
                 try:
-                    key = tuple(sorted(hash(o) for o in CURRENT))
+                    key = tuple(sorted(CURRENT))
                     operation = self.nexts[key]
                     return operation.launch()
                 except KeyError:

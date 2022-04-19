@@ -20,9 +20,7 @@ def run(argument):
     return lambda: os.system(argument)
 
 def make_key(arguments):
-    result = [hash(a) for a in arguments]
-    result.sort()
-    return tuple(result)
+    return arguments
 
 def combination(*args):
     return [make_key(k) for k in args]

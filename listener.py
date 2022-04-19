@@ -30,6 +30,8 @@ def on_release(key):
             del CURRENT[n]
         else:
             CURRENT[n] = v
+    else:
+        CURRENT.clear()
 
 def key_tuple(keys):
     return tuple(sorted(key_number(key) for key in keys))

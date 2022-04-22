@@ -15,7 +15,7 @@ def key_number(key):
 def add_key(key):
     n = key_number(key)
     CURRENT.setdefault(n, 0)
-    CURRENT[n]+=1
+    CURRENT[n] = time.clock_gettime(time.CLOCK_REALTIME)
 
 def on_press(key):
     add_key(key)
@@ -24,13 +24,9 @@ def on_press(key):
 
 def on_release(key):
     n = key_number(key)
-    if n in CURRENT:
-        v = CURRENT[n]-1
-        if v <= 0:
-            del CURRENT[n]
-        else:
-            CURRENT[n] = v
-    else:
+    try:
+        del CURRENT[n]
+    except KeyError:
         CURRENT.clear()
 
 def key_tuple(keys):
@@ -66,12 +62,14 @@ class InputGroup():
         while elapsed_time + 0.01 < DWELL_TIME:
             with CONDITION:
                 activated = CONDITION.wait(DWELL_TIME-elapsed_time)
-            elapsed_time = time.clock_gettime(time.CLOCK_REALTIME)-start_time
+            now = time.clock_gettime(time.CLOCK_REALTIME)
+            elapsed_time = now - start_time
             if activated:
                 hit_anything = True
                 try:
-                    key = tuple(sorted(CURRENT))
+                    key = tuple(sorted(k for k,v in CURRENT.items() if now - start_time < 0.4))
                     operation = self.nexts[key]
+                    CURRENT.clear()
                     return operation.launch()
                 except KeyError:
                     pass
